@@ -1,0 +1,49 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.13.35919.96
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RubikCube.App", "RubikCube.App\RubikCube.App.csproj", "{B6263784-B436-4455-AD61-B5B39E45EB5F}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RubikCube.Services", "RubikCube.Services\RubikCube.Services.csproj", "{D5758A89-DA74-42FC-8BC4-B83B18F91BF5}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RubikCube.Core", "RubikCube.Core\RubikCube.Core.csproj", "{B9CE8B34-042C-A238-EFEB-A081812C01A3}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RubikCube.Common", "RubikCube.Common\RubikCube.Common.csproj", "{11732888-812F-4882-9203-F78056BB6A8E}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RubikCube.Tests", "RubikCube.Tests\RubikCube.Tests.csproj", "{F5EE56A5-10D2-408E-87A9-FA3F276CCB0F}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{B6263784-B436-4455-AD61-B5B39E45EB5F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B6263784-B436-4455-AD61-B5B39E45EB5F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B6263784-B436-4455-AD61-B5B39E45EB5F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B6263784-B436-4455-AD61-B5B39E45EB5F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D5758A89-DA74-42FC-8BC4-B83B18F91BF5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D5758A89-DA74-42FC-8BC4-B83B18F91BF5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D5758A89-DA74-42FC-8BC4-B83B18F91BF5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D5758A89-DA74-42FC-8BC4-B83B18F91BF5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B9CE8B34-042C-A238-EFEB-A081812C01A3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B9CE8B34-042C-A238-EFEB-A081812C01A3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B9CE8B34-042C-A238-EFEB-A081812C01A3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B9CE8B34-042C-A238-EFEB-A081812C01A3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{11732888-812F-4882-9203-F78056BB6A8E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{11732888-812F-4882-9203-F78056BB6A8E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{11732888-812F-4882-9203-F78056BB6A8E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{11732888-812F-4882-9203-F78056BB6A8E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F5EE56A5-10D2-408E-87A9-FA3F276CCB0F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F5EE56A5-10D2-408E-87A9-FA3F276CCB0F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F5EE56A5-10D2-408E-87A9-FA3F276CCB0F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F5EE56A5-10D2-408E-87A9-FA3F276CCB0F}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {F61EF9D8-714F-4006-80B3-FBEF6D50665A}
+	EndGlobalSection
+EndGlobal
