@@ -129,41 +129,58 @@ namespace RubikCube.Services
                 return Result<IEnumerable<Square>>.BadResult("Invalid cube.");
             }
 
-            if (RotationCycleOne.Contains(new KeyValuePair<FaceDirection, FaceDirection>(request.startSwipeDirection, request.endSwipeDirection)))
-            {
-                var startingIncrement = request.Cell.FirstRotationNumber - (request.Cell.FirstRotationNumber % (request.Length * 4));
+            var maxLengthForExtraRotation = request.Length * 4;
+            var minLengthForExtraRotation = request.Length * 4 * (request.Length - 1);
 
-                RotateCubeColors(request.CubeData, RotationCycleOne, startingIncrement, RotationType.FirstRotation, request.Length, false);
-            }
-            else if (RotationCycleOne.Contains(new KeyValuePair<FaceDirection, FaceDirection>(request.endSwipeDirection, request.startSwipeDirection)))
-            {
-                var startingIncrement = request.Cell.FirstRotationNumber - (request.Cell.FirstRotationNumber % (request.Length * 4));
+            FaceDirection? extraRotation = null;
+            bool isExtraRotationInverted = false;
 
-                RotateCubeColors(request.CubeData, RotationCycleOne, startingIncrement, RotationType.FirstRotation, request.Length, true);
-            }
-            else if (RotationCycleTwo.Contains(new KeyValuePair<FaceDirection, FaceDirection>(request.startSwipeDirection, request.endSwipeDirection)))
+            var rotationCycles = new[]
             {
-                var startingIncrement = request.Cell.SecondRotationNumber - (request.Cell.SecondRotationNumber % (request.Length * 4));
+                new { Cycle = RotationCycleOne, RotationType = RotationType.FirstRotation, GetRotationNumber = (Func<Cell, int>)(cell => cell.FirstRotationNumber) },
+                new { Cycle = RotationCycleTwo, RotationType = RotationType.SecondRotation, GetRotationNumber = (Func<Cell, int>)(cell => cell.SecondRotationNumber) },
+                new { Cycle = RotationCycleThree, RotationType = RotationType.ThirdRotation, GetRotationNumber = (Func<Cell, int>)(cell => cell.ThirdRotationNumber) }
+            };
 
-                RotateCubeColors(request.CubeData, RotationCycleTwo, startingIncrement, RotationType.SecondRotation, request.Length, false);
-            }
-            else if (RotationCycleTwo.Contains(new KeyValuePair<FaceDirection, FaceDirection>(request.endSwipeDirection, request.startSwipeDirection)))
+            foreach (var rotationCycle in rotationCycles)
             {
-                var startingIncrement = request.Cell.SecondRotationNumber - (request.Cell.SecondRotationNumber % (request.Length * 4));
+                var cycle = rotationCycle.Cycle;
 
-                RotateCubeColors(request.CubeData, RotationCycleTwo, startingIncrement, RotationType.SecondRotation, request.Length, true);
-            }
-            else if (RotationCycleThree.Contains(new KeyValuePair<FaceDirection, FaceDirection>(request.startSwipeDirection, request.endSwipeDirection)))
-            {
-                var startingIncrement = request.Cell.ThirdRotationNumber - (request.Cell.ThirdRotationNumber % (request.Length * 4));
+                if (cycle.Contains(new KeyValuePair<FaceDirection, FaceDirection>(request.startSwipeDirection, request.endSwipeDirection)) ||
+                    cycle.Contains(new KeyValuePair<FaceDirection, FaceDirection>(request.endSwipeDirection, request.startSwipeDirection)))
+                {
+                    var rotationNumber = rotationCycle.GetRotationNumber(request.Cell);
+                    var rotationType = rotationCycle.RotationType;
 
-                RotateCubeColors(request.CubeData, RotationCycleThree, startingIncrement, RotationType.ThirdRotation, request.Length, false);
-            }
-            else if (RotationCycleThree.Contains(new KeyValuePair<FaceDirection, FaceDirection>(request.endSwipeDirection, request.startSwipeDirection)))
-            {
-                var startingIncrement = request.Cell.ThirdRotationNumber - (request.Cell.ThirdRotationNumber % (request.Length * 4));
+                    var startingIncrement = rotationNumber - (rotationNumber % (request.Length * 4));
+                    bool isInverted = cycle.Contains(new KeyValuePair<FaceDirection, FaceDirection>(request.endSwipeDirection, request.startSwipeDirection));
 
-                RotateCubeColors(request.CubeData, RotationCycleThree, startingIncrement, RotationType.ThirdRotation, request.Length, true);
+                    if (rotationNumber < maxLengthForExtraRotation)
+                    {
+                        extraRotation = rotationType switch
+                        {
+                            RotationType.FirstRotation => FaceDirection.Up,
+                            RotationType.SecondRotation => FaceDirection.Front,
+                            RotationType.ThirdRotation => FaceDirection.Left,
+                            _ => throw new ArgumentOutOfRangeException()
+                        };
+                        isExtraRotationInverted = isInverted;
+                    }
+                    else if (rotationNumber >= minLengthForExtraRotation)
+                    {
+                        extraRotation = rotationType switch
+                        {
+                            RotationType.FirstRotation => FaceDirection.Down,
+                            RotationType.SecondRotation => FaceDirection.Bottom,
+                            RotationType.ThirdRotation => FaceDirection.Right,
+                            _ => throw new ArgumentOutOfRangeException()
+                        };
+                        isExtraRotationInverted = !isInverted;
+                    }
+
+                    RotateCubeColors(request.CubeData, rotationCycle.Cycle, startingIncrement, rotationCycle.RotationType, request.Length, extraRotation, isExtraRotationInverted, isInverted);
+                    break;
+                }
             }
 
             return Result<IEnumerable<Square>>.OkResult(request.CubeData);
@@ -179,13 +196,16 @@ namespace RubikCube.Services
         /// <param name="rotationType">The rotation swipe direction.</param>
         /// <param name="length">Length of cube.</param>
         /// <param name="isInverted">Checks if the direction is forward or backward.</param>
-        /// <exception cref="ArgumentException"></exception>
+        /// <param name="extraRotation">The square that should be rotated when movement is on the edge of cube</param>
+        /// <param name="isExtraRotationInverted">Whether the movement is 90 degrees clockwise or counterClockwise</param>
         private void RotateCubeColors(
             List<Square> cubeData,
             KeyValuePair<FaceDirection, FaceDirection>[] rotationCycle,
             int indexIncrement,
             RotationType rotationType,
             int length,
+            FaceDirection? extraRotation,
+            bool isExtraRotationInverted,
             bool isInverted)
         {
             for (int i = 0; i < rotationCycle.Length - 1; i++)
@@ -228,6 +248,49 @@ namespace RubikCube.Services
                     endCell.Color = previousColor;
                 }
             }
+
+            if (extraRotation != null)
+            {
+                RotateEdgeSquare(cubeData, length, extraRotation, isExtraRotationInverted);
+            }
+        }
+
+        /// <summary>
+        /// Rotates the square that is completely surrounded by the row/col movement.
+        /// </summary>
+        /// <param name="cubeData">The cube.</param>
+        /// <param name="length">Length of cube.</param>
+        /// <param name="extraRotation">The square that should be rotated when movement is on the edge of cube</param>
+        /// <param name="isExtraRotationInverted">Whether the movement is 90 degrees clockwise or counterClockwise</param>
+        private void RotateEdgeSquare(List<Square> cubeData, int length, FaceDirection? extraRotation, bool isExtraRotationInverted)
+        {
+            var squareToRotate = cubeData.First(cd => cd.Direction == extraRotation);
+            var cellsToRotateCopy = new List<Cell>();
+
+            for (int i = 0; i < length; ++i)
+            {
+                for (int j = 0; j < length; ++j)
+                {
+                    var rowToSwap = isExtraRotationInverted ? length - j - 1 : j;
+                    var colToSwap = isExtraRotationInverted ? i : length - i - 1;
+
+                    var startCell = squareToRotate.Cells.First(cell => cell.Row == i && cell.Column == j);
+                    var cellToSwap = squareToRotate.Cells.First(cell => cell.Row == rowToSwap && cell.Column == colToSwap);
+
+                    var newCellCopy = new Cell(
+                        startCell.Row,
+                        startCell.Column,
+                        cellToSwap.Color,
+                        startCell.FirstRotationNumber,
+                        startCell.SecondRotationNumber,
+                        startCell.ThirdRotationNumber);
+
+                    cellsToRotateCopy.Add(newCellCopy);
+                }
+            }
+
+            squareToRotate.Cells.Clear();
+            squareToRotate.Cells.AddRange(cellsToRotateCopy);
         }
 
         /// <summary>
